@@ -37,7 +37,7 @@ def get_db():
         conn.close()
 
 def insert_prediction(record: dict):
-    ist_now = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")   # NAYA — IST time banaya
+    ist_now = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")   #timein_ist
     with get_db() as conn:
         conn.execute("""
             INSERT INTO predictions
