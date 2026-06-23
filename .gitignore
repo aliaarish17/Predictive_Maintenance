@@ -1,0 +1,30 @@
+# ============================
+# BACKEND (Python/FastAPI)
+# ============================
+backend/myenv/
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+**/.env
+**/.env.*
+backend/predictive_maintenance.db
+backend/.pytest_cache/
+
+# ============================
+# FRONTEND (React/Vite)
+# ============================
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+frontend/.vite/
+
+# ============================
+# EDITOR / OS FILES
+# ============================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
