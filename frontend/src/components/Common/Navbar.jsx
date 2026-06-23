@@ -1,7 +1,9 @@
 import React from 'react'
 import logo from '../../assets/logo.svg'
 import { Link,NavLink } from 'react-router-dom'
-function Navbar() {
+
+
+export default function Navbar() {
   return (
     <>
     <div className=' fixed  flex flex-row justify-between  w-full h-auto bg-[#F8FAFC] border-2 border-[#E2E8F0]'>
@@ -86,4 +88,3 @@ function Navbar() {
     )
 }
 
-export default Navbar
