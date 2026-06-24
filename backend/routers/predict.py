@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException
 from schemas import FailureInput, RULInput, PredictionResponse
 from ml_utils import predict_failure, predict_rul
-from ai_explain import generate_explanation, get_fallback_explanation
+from ai_explain import generate_explanation
 from database import insert_prediction
 import uuid
 
@@ -16,15 +16,15 @@ async def predict_failure_endpoint(payload: FailureInput):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failure prediction error: {str(e)}")
 
-    try:
-        explanation = generate_explanation(
+   
+    explanation = generate_explanation(
             "failure",
             prediction["result"],
             prediction["shap_values"],
-            data
+            data,
+            prediction["risk_level"]
     )
-    except Exception as e:
-        explanation = f"LLM ERROR: {str(e)}"
+    
 
 
     record = {
@@ -56,15 +56,15 @@ async def predict_rul_endpoint(payload: RULInput):
         prediction = predict_rul(data["sensor_readings"])
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"RUL prediction error: {str(e)}")
-    try:
-        explanation = generate_explanation(
+    
+    explanation = generate_explanation(
             "rul",
             prediction["result"],
             prediction["shap_values"],
-            data["sensor_readings"]
+            data["sensor_readings"],
+            prediction["risk_level"]
         )
-    except Exception as e:
-        explanation = f"LLM ERROR: {str(e)}"
+   
 
     record = {
         "id": str(uuid.uuid4()),

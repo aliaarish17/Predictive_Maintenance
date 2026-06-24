@@ -6,7 +6,7 @@ import { Link,NavLink } from 'react-router-dom'
 export default function Navbar() {
   return (
     <>
-    <div className=' fixed  flex flex-row justify-between  w-full h-auto bg-[#F8FAFC] border-2 border-[#E2E8F0]'>
+    <div className=' sticky flex flex-row justify-between  w-full h-auto bg-[#F8FAFC] border-2 border-[#E2E8F0]'>
     <div className='pt-3 pb-2 pr-3 pl-2'>
      <Link to="/" className='flex flex-row items-center gap-3'>
       <img className='w-8 h-8' src={logo} alt="Logo" />

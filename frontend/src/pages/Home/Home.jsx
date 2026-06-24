@@ -59,9 +59,13 @@ export default function Home() {
         ))}
       </div>
 
-      <button onClick={()=> navigate("/dashboard")} className='border-white cursor-pointer hover:bg-green-600 transition-all ease-in   px-7 py-3 mt-6 rounded-xl text-white font-bold bg-green-500 outline-0 '>
+      <Link 
+      to='/dashboard'>
+      <button className='border-white cursor-pointer hover:bg-green-600 transition-all ease-in   px-7 py-3 mt-6 rounded-xl text-white font-bold bg-green-500 outline-0 '>
         Launch Dashboard
       </button>
+      </Link>
+
       </div>
 
 

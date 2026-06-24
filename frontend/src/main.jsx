@@ -17,14 +17,14 @@ import History from './pages/History/History.jsx'
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<Layout/>}>
-      <Route path='home' element={<Home/>}/>
+      <Route path='home'element={<Home/>}/>
       <Route path='dashboard' element={<Dashboard/>}/>
       <Route path='machines' element={<Machines/>}/>
       <Route path='predict' element={<PredictionPage/>}/>
       <Route path='history' element={<History/>}/>
     </Route>
   )
-)
+);
 //Rendering the app through router provider
 createRoot(document.getElementById('root')).render(
   <StrictMode>
