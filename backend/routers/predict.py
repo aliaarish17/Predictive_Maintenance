@@ -30,6 +30,7 @@ async def predict_failure_endpoint(payload: FailureInput):
     record = {
         "id": str(uuid.uuid4()),
         "source": "predict_input",
+        "machine_unit": data.get("machine_name"),
         "machine_type": data.get("machine_type"),
         "input_data": data,
         "prediction_type": "failure",

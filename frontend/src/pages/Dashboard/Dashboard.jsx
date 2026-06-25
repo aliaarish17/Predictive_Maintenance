@@ -19,22 +19,39 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    getHistory({ limit: 200 })
-      .then((res) => {
-        const preds = res.data.predictions;
-        setPredictions(preds);
+ useEffect(()=>{
+  ;(async () => {
+    try {
+      setLoading(true)
+      setError(false)
+       const res = await getHistory({limit:200})
+      //  console.log(res.data)
+       const preds = res.data.predictions;
+       setPredictions(preds)
 
-        const sorted = preds.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        const scored = sorted.map((p, i) => ({ cycle: i + 1, avgRisk: RISK_SCORE[p.risk_level] ?? 0 }));
-        setTrendData(getRollingAverage(scored));
-      })
-      .catch(() => setError("Could not load dashboard data"))
-      .finally(() => setLoading(false));
-  }, []);
+       const sorted = preds.slice().sort((a,b)=> new Date(a.created_at)- new Date(b.created_at));
 
-  if (loading) return <p className="text-slate-400 p-8">Loading dashboard...</p>;
-  if (error) return <p className="text-red-500 p-8">{error}</p>;
+       const scored = sorted.map((p,i)=> ({cycle: i+1, avgRisk: RISK_SCORE[p.risk_level]??0}));
+
+       setTrendData(getRollingAverage(scored));
+       
+    } catch (error) {
+      setError(true)
+          
+    } finally{
+      setLoading(false)
+    }
+    
+  })();
+
+ },[]);
+ if (error){
+  return <div className="text-red-500">Something went wrong</div>
+ }
+
+ if (loading){
+  return <div className="text-red-500">Loading...</div>
+ }
 
   const uniqueMachines = new Set(
     predictions.filter((p) => p.machine_unit).map((p) => p.machine_unit)
@@ -56,7 +73,7 @@ function Dashboard() {
 
   return (
     <div className="p-8 max-w-[1240px] mx-auto">
-      <h2 className="text-slate-100 text-2xl font-semibold mb-5">Fleet Overview</h2>
+      <h2 className="text-black  text-3xl font-semibold mb-5">Fleet Overview</h2>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-4 mb-7">
@@ -67,9 +84,9 @@ function Dashboard() {
       </div>
 
       {/* Failure Risk Trend */}
-      <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-5 mb-4">
+      <div className="bg-[#10151D] border border-[#1E2733]  rounded-xl p-5 mb-4">
         <h3 className="text-slate-100 text-sm font-semibold mb-4">Failure Risk Trend</h3>
-        <FailureTrendChart data={trendData} />
+        <FailureTrendChart  data={trendData} />
       </div>
 
       {/* Machines Needing Attention */}

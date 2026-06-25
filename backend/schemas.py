@@ -2,6 +2,7 @@ from pydantic import BaseModel,Field
 from typing import Literal,Optional,Annotated
 
 class FailureInput(BaseModel):
+    machine_name: Optional[str]= None
     machine_type : Optional[Literal['L','M','H']] = None
     air_temperature: float = Field(..., gt=0)
     process_temperature: float = Field(..., gt=0)
