@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { getHistory } from "../../services/api";
 import FailureTrendChart from "./FailureTrendChart";
+import MPie from "./Pie";
+
 
 const RISK_SCORE = { high: 100, medium: 50, low: 10 };
 
@@ -59,6 +61,18 @@ function Dashboard() {
 
   const highRiskCount = predictions.filter((p) => p.risk_level === "high").length;
 
+  const healthyCount = predictions.filter((p)=> p.risk_level==="low").length;
+  const WarningCount = predictions.filter((p)=> p.risk_level==="medium").length;
+  const CriticalCount = predictions.filter((p)=> p.risk_level==="high").length;
+
+  const pieData= [
+    {name: "Healthy", value: healthyCount, color: "#10B981" },
+    {name: "Warning", value: WarningCount, color: "#F59E0B"},
+    {name: "Critical", value: CriticalCount, color: "#EF4444" },
+    
+  ];
+
+
   const rulPredictions = predictions.filter((p) => p.prediction_type === "rul");
   const avgRUL = rulPredictions.length
     ? (rulPredictions.reduce((sum, p) => sum + p.result.rul_cycles, 0) / rulPredictions.length).toFixed(1)
@@ -83,10 +97,17 @@ function Dashboard() {
         <KpiCard label="Predictions Today" value={todayCount} colorClass="text-emerald-400" />
       </div>
 
-      {/* Failure Risk Trend */}
-      <div className="bg-[#10151D] border border-[#1E2733]  rounded-xl p-5 mb-4">
+      {/* Charts AREA */}
+      <div className="flex flex-row gap-5 mb-4 w-full">
+      <div className="bg-[#10151D] w-2/3 border border-[#1E2733]  rounded-xl p-5 mb-4">
         <h3 className="text-slate-100 text-sm font-semibold mb-4">Failure Risk Trend</h3>
         <FailureTrendChart  data={trendData} />
+      </div>
+      <div className="w-1/3 bg-[#10151D] border border-[#1E2733] rounded-xl p-5 min-w-0">
+      <h3 className="text-slate-100 text-sm font-semibold mb-4">Machine Health Distribution</h3>
+      <MPie data={pieData} />
+  </div>
+
       </div>
 
       {/* Machines Needing Attention */}
