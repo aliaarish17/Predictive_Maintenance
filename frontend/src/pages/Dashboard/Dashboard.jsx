@@ -1,9 +1,8 @@
-// src/pages/Dashboard/Dashboard.jsx
+// Dashboard.jsx
 import { useEffect, useState } from "react";
 import { getHistory } from "../../services/api";
 import FailureTrendChart from "./FailureTrendChart";
 import MPie from "./Pie";
-
 
 const RISK_SCORE = { high: 100, medium: 50, low: 10 };
 
@@ -15,63 +14,41 @@ function getRollingAverage(data, windowSize = 5) {
   });
 }
 
+function formatResult(p) {
+  if (p.prediction_type === "rul") return `${p.result.rul_cycles} cycles`;
+  return p.result.failure_predicted ? "Failure predicted" : "No failure";
+}
+
 function Dashboard() {
   const [predictions, setPredictions] = useState([]);
   const [trendData, setTrendData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
- useEffect(()=>{
-  ;(async () => {
-    try {
-      setLoading(true)
-      setError(false)
-       const res = await getHistory({limit:200})
-      //  console.log(res.data)
-       const preds = res.data.predictions;
-       setPredictions(preds)
+  useEffect(() => {
+    getHistory({ limit: 200 })
+      .then((res) => {
+        const preds = res.data.predictions;
+        setPredictions(preds);
 
-       const sorted = preds.slice().sort((a,b)=> new Date(a.created_at)- new Date(b.created_at));
+        const sorted = preds.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        const scored = sorted.map((p, i) => ({ cycle: i + 1, avgRisk: RISK_SCORE[p.risk_level] ?? 0 }));
+        setTrendData(getRollingAverage(scored));
+      })
+      .catch(() => setError("Could not load dashboard data"))
+      .finally(() => setLoading(false));
+  }, []);
 
-       const scored = sorted.map((p,i)=> ({cycle: i+1, avgRisk: RISK_SCORE[p.risk_level]??0}));
-
-       setTrendData(getRollingAverage(scored));
-       
-    } catch (error) {
-      setError(true)
-          
-    } finally{
-      setLoading(false)
-    }
-    
-  })();
-
- },[]);
- if (error){
-  return <div className="text-red-500">Something went wrong</div>
- }
-
- if (loading){
-  return <div className="text-red-500">Loading...</div>
- }
+  if (loading) return <p className="text-slate-400 p-8">Loading dashboard...</p>;
+  if (error) return <p className="text-red-500 p-8">{error}</p>;
 
   const uniqueMachines = new Set(
     predictions.filter((p) => p.machine_unit).map((p) => p.machine_unit)
   ).size;
 
-  const highRiskCount = predictions.filter((p) => p.risk_level === "high").length;
-
-  const healthyCount = predictions.filter((p)=> p.risk_level==="low").length;
-  const WarningCount = predictions.filter((p)=> p.risk_level==="medium").length;
-  const CriticalCount = predictions.filter((p)=> p.risk_level==="high").length;
-
-  const pieData= [
-    {name: "Healthy", value: healthyCount, color: "#10B981" },
-    {name: "Warning", value: WarningCount, color: "#F59E0B"},
-    {name: "Critical", value: CriticalCount, color: "#EF4444" },
-    
-  ];
-
+  const highRiskCount = new Set(
+    predictions.filter((p) => p.risk_level === "high" && p.machine_unit).map((p) => p.machine_unit)
+  ).size;
 
   const rulPredictions = predictions.filter((p) => p.prediction_type === "rul");
   const avgRUL = rulPredictions.length
@@ -81,53 +58,89 @@ function Dashboard() {
   const today = new Date().toISOString().split("T")[0];
   const todayCount = predictions.filter((p) => p.created_at.startsWith(today)).length;
 
-  const needsAttention = predictions
-    .filter((p) => p.risk_level !== "low" && p.machine_unit)
-    .slice(0, 5);
+  // Sirf most recent 6 — table mein dikhane ke liye, naya-se-purana
+  const recentPredictions = predictions
+    .slice()
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 8);
+
+  const healthyCount = predictions.filter((p) => p.risk_level === "low").length;
+  const warningCount = predictions.filter((p) => p.risk_level === "medium").length;
+  const criticalCount = predictions.filter((p) => p.risk_level === "high").length;
+  const pieData = [
+    { name: "Healthy", value: healthyCount, color: "#10B981" },
+    { name: "Warning", value: warningCount, color: "#F59E0B" },
+    { name: "Critical", value: criticalCount, color: "#EF4444" },
+  ];
 
   return (
-    <div className="p-8 max-w-[1240px] mx-auto">
-      <h2 className="text-black  text-3xl font-semibold mb-5">Fleet Overview</h2>
+    <div className="h-[calc(100vh-64px)] flex flex-col p-6 max-w-[1400px] mx-auto overflow-hidden">
+      <h2 className="text-slate-100 text-xl font-semibold mb-4 flex-shrink-0">Fleet Overview</h2>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-4 gap-3 mb-3 flex-shrink-0">
         <KpiCard label="Machines Monitored" value={uniqueMachines} />
         <KpiCard label="High Breakdown Risk" value={highRiskCount} colorClass="text-red-500" />
         <KpiCard label="Avg Life Remaining" value={`${avgRUL} cycles`} colorClass="text-amber-500" />
         <KpiCard label="Predictions Today" value={todayCount} colorClass="text-emerald-400" />
       </div>
 
-      {/* Charts AREA */}
-      <div className="flex flex-row gap-5 mb-4 w-full">
-      <div className="bg-[#10151D] w-2/3 border border-[#1E2733]  rounded-xl p-5 mb-4">
-        <h3 className="text-slate-100 text-sm font-semibold mb-4">Failure Risk Trend</h3>
-        <FailureTrendChart  data={trendData} />
-      </div>
-      <div className="w-1/3 bg-[#10151D] border border-[#1E2733] rounded-xl p-5 min-w-0">
-      <h3 className="text-slate-100 text-sm font-semibold mb-4">Machine Health Distribution</h3>
-      <MPie data={pieData} />
-  </div>
+      {/* Middle row — chart + pie */}
+      <div className="grid grid-cols-[1.7fr_1fr] gap-3 mb-3 flex-1 min-h-0">
+        <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 flex flex-col min-h-0">
+          <h3 className="text-slate-100 text-xs font-semibold mb-2 flex-shrink-0">Failure Risk Trend</h3>
+          <div className="flex-1 min-h-0">
+            <FailureTrendChart data={trendData} />
+          </div>
+        </div>
 
+        <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 flex flex-col min-h-0">
+          <h3 className="text-slate-100 text-xs font-semibold mb-3 flex-shrink-0">Machine Health Distribution</h3>
+          <div className="flex-1 min-h-0">
+            <MPie data={pieData} />
+          </div>
+        </div>
       </div>
 
-      {/* Machines Needing Attention */}
-      <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-5">
-        <h3 className="text-slate-100 text-sm font-semibold mb-4">Machines Needing Attention</h3>
-        {needsAttention.length === 0 ? (
-          <p className="text-slate-400 text-sm">No machines need attention right now.</p>
-        ) : (
-          needsAttention.map((p) => (
-            <div
-              key={p.id}
-              className="flex justify-between items-center py-3 border-b border-[#1E2733] last:border-b-0 text-slate-100 text-sm"
-            >
-              <span>{p.machine_unit}</span>
-              <span className={p.risk_level === "high" ? "text-red-500 font-semibold" : "text-amber-500 font-semibold"}>
-                {p.risk_level.toUpperCase()}
-              </span>
-            </div>
-          ))
-        )}
+      {/* Bottom — Recent Predictions table */}
+      <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 flex-shrink-0 flex flex-col" style={{ height: "210px" }}>
+        <h3 className="text-slate-100 text-xs font-semibold mb-2 flex-shrink-0">Recent Predictions</h3>
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-[#10151D]">
+              <tr className="border-b border-[#1E2733]">
+                <th className="text-left text-slate-500 text-[11px] uppercase font-medium py-2 px-2">Timestamp</th>
+                <th className="text-left text-slate-500 text-[11px] uppercase font-medium py-2 px-2">Type</th>
+                <th className="text-left text-slate-500 text-[11px] uppercase font-medium py-2 px-2">Machine</th>
+                <th className="text-left text-slate-500 text-[11px] uppercase font-medium py-2 px-2">Result</th>
+                <th className="text-left text-slate-500 text-[11px] uppercase font-medium py-2 px-2">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentPredictions.map((p) => (
+                <tr key={p.id} className="border-b border-[#1E2733]/50 hover:bg-white/[0.02]">
+                  <td className="py-2 px-2 font-mono text-xs text-slate-400">{p.created_at}</td>
+                  <td className="py-2 px-2">
+                    <span className={`text-[11px] font-mono font-semibold px-2 py-0.5 rounded ${
+                      p.prediction_type === "failure" ? "bg-red-500/15 text-red-400" : "bg-cyan-500/15 text-cyan-400"
+                    }`}>
+                      {p.prediction_type === "failure" ? "Failure" : "RUL"}
+                    </span>
+                  </td>
+                  <td className="py-2 px-2 font-mono text-xs text-slate-300">{p.machine_unit || "—"}</td>
+                  <td className="py-2 px-2 text-slate-100">{formatResult(p)}</td>
+                  <td className="py-2 px-2">
+                    <span className={`text-xs font-semibold ${
+                      p.risk_level === "high" ? "text-red-500" : p.risk_level === "medium" ? "text-amber-500" : "text-emerald-400"
+                    }`}>
+                      {p.risk_level === "high" ? "Will Fail: Yes" : p.risk_level === "low" ? "Good" : "Watch"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -135,9 +148,9 @@ function Dashboard() {
 
 function KpiCard({ label, value, colorClass = "text-slate-100" }) {
   return (
-    <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-5">
-      <div className="text-slate-400 text-xs uppercase tracking-wide">{label}</div>
-      <div className={`${colorClass} text-3xl font-semibold mt-3`}>{value}</div>
+    <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4">
+      <div className="text-slate-400 text-[11px] uppercase tracking-wide">{label}</div>
+      <div className={`${colorClass} text-2xl font-semibold mt-2`}>{value}</div>
     </div>
   );
 }

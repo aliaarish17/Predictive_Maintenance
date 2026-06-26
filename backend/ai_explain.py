@@ -5,11 +5,8 @@ from config import settings
 client = genai.Client(api_key=settings.gemini_api_key)
 
 def generate_explanation(prediction_type: str, result: dict, shap_values: list[dict], input_data: dict, risk_level: str) -> str:
-    # ── LOW risk: hardcoded, no LLM call ──
     if risk_level == "low":
         return get_low_risk_message(prediction_type, result)
-
-    # ── HIGH / MEDIUM risk: LLM call, with fallback on failure ──
     try:
         return _call_gemini(prediction_type, result, shap_values, input_data)
     except Exception:
@@ -28,15 +25,27 @@ def _call_gemini(prediction_type: str, result: dict, shap_values: list[dict], in
         outcome = f"Remaining useful life: {result['rul_cycles']} cycles"
 
     prompt = f"""You are an industrial maintenance assistant explaining a machine learning prediction
-            to a plant floor technician who is not a data scientist.
+to a plant floor technician who is not a data scientist.
 
-    Prediction outcome: {outcome}
-    Top contributing factors: {shap_summary}
-    Raw input readings: {input_data}
+Prediction outcome: {outcome}
+Top contributing factors: {shap_summary}
+Raw input readings: {input_data}
 
-    Write a short, plain-language explanation (3-4 sentences) of why this prediction was made,
-    followed by 2-3 concrete recommended safety/maintenance actions as a bulleted list.
-    Avoid technical ML jargon like 'SHAP' or 'feature importance'."""
+Respond in EXACTLY this format with no extra text:
+
+EXPLANATION
+<3 sentences max explaining why this prediction was made in plain language. No ML jargon.>
+
+ACTIONS
+- <action 1>
+- <action 2>
+- <action 3>
+
+Rules:
+- EXPLANATION must be exactly 3 sentences
+- ACTIONS must be exactly 3 bullet points starting with -
+- No bold, no asterisks, no extra headings
+- Keep each action to 1 sentence"""
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
@@ -46,32 +55,39 @@ def _call_gemini(prediction_type: str, result: dict, shap_values: list[dict], in
 
 
 def get_low_risk_message(prediction_type: str, result: dict) -> str:
-    """Low risk ke liye hardcoded, professional-sounding message — no API call needed."""
     if prediction_type == "failure":
         return (
-            "This machine is currently operating within normal parameters and shows "
-            "no significant signs of impending failure. Sensor readings are stable "
-            "and consistent with healthy operation.\n\n"
-            "Recommended actions:\n"
+            "EXPLANATION\n"
+            "This machine is currently operating within normal parameters and shows no significant signs of impending failure. "
+            "Sensor readings are stable and consistent with healthy operation. "
+            "No immediate intervention is required at this time.\n\n"
+            "ACTIONS\n"
             "- Continue routine monitoring on the standard schedule.\n"
+            "- Log current sensor readings as baseline for future comparison.\n"
             "- No immediate maintenance action required."
         )
     else:
-        cycles = result.get("rul_cycles", "a substantial number of")
+        cycles = result.get("rul_cycles", "many")
         return (
-            f"This unit has an estimated {cycles} cycles of remaining useful life, "
-            "indicating healthy operating condition with no immediate concerns. "
-            "Sensor trends do not show signs of accelerated degradation.\n\n"
-            "Recommended actions:\n"
+            f"EXPLANATION\n"
+            f"This unit has an estimated {cycles} cycles of remaining useful life, indicating healthy operating condition. "
+            "Sensor trends do not show signs of accelerated degradation or wear. "
+            "The machine is performing within expected parameters for its current stage.\n\n"
+            "ACTIONS\n"
             "- Continue routine monitoring on the standard schedule.\n"
-            "- Re-check prediction after the next scheduled maintenance cycle."
+            "- Re-check prediction after the next scheduled maintenance cycle.\n"
+            "- Log current sensor readings as a healthy baseline."
         )
 
 
 def get_fallback_explanation(prediction_type: str, risk_level: str) -> str:
-    """LLM call fail hone par (high/medium risk ke liye) generic fallback."""
     return (
-        f"This {prediction_type} prediction indicates a {risk_level} risk level. "
-        "Detailed explanation is temporarily unavailable — please review the SHAP "
-        "chart above and consult your maintenance guidelines."
+        f"EXPLANATION\n"
+        f"This {prediction_type} prediction indicates a {risk_level} risk level based on current sensor readings. "
+        "Detailed AI analysis is temporarily unavailable due to a connection issue. "
+        "Please review the SHAP chart and consult your maintenance guidelines.\n\n"
+        "ACTIONS\n"
+        "- Inspect the top sensors flagged in the SHAP chart above.\n"
+        "- Consult your standard maintenance checklist for this risk level.\n"
+        "- Re-run the prediction once the AI service is restored."
     )
