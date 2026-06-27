@@ -83,10 +83,10 @@ function Dashboard() {
     exit="exit">
 
     <div className="h-[calc(100vh-64px)] flex flex-col p-6 max-w-[1400px] mx-auto overflow-hidden">
-      <h2 className="text-slate-100 text-xl font-semibold mb-4 flex-shrink-0">Fleet Overview</h2>
+      <h2 className="text-slate-100 text-xl font-semibold mb-4 shrink-0">Fleet Overview</h2>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-3 mb-3 flex-shrink-0">
+      <div className="grid grid-cols-4 gap-3 mb-3 shrink-0">
         <KpiCard label="Machines Monitored" value={uniqueMachines} />
         <KpiCard label="High Breakdown Risk" value={highRiskCount} colorClass="text-red-500" />
         <KpiCard label="Avg Life Remaining" value={`${avgRUL} cycles`} colorClass="text-amber-500" />
@@ -96,14 +96,14 @@ function Dashboard() {
       {/* Middle row — chart + pie */}
       <div className="grid grid-cols-[1.7fr_1fr] gap-3 mb-3 flex-1 min-h-0">
         <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 flex flex-col min-h-0">
-          <h3 className="text-slate-100 text-xs font-semibold mb-2 flex-shrink-0">Failure Risk Trend</h3>
+          <h3 className="text-slate-100 text-xs font-semibold mb-2 shrink-0">Failure Risk Trend</h3>
           <div className="flex-1 min-h-0">
             <FailureTrendChart data={trendData} />
           </div>
         </div>
 
         <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 flex flex-col min-h-0">
-          <h3 className="text-slate-100 text-xs font-semibold mb-3 flex-shrink-0">Machine Health Distribution</h3>
+          <h3 className="text-slate-100 text-xs font-semibold mb-3 shrink-0">Machine Health Distribution</h3>
           <div className="flex-1 min-h-0">
             <MPie data={pieData} />
           </div>
@@ -111,8 +111,8 @@ function Dashboard() {
       </div>
 
       {/* Bottom — Recent Predictions table */}
-      <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 flex-shrink-0 flex flex-col" style={{ height: "210px" }}>
-        <h3 className="text-slate-100 text-xs font-semibold mb-2 flex-shrink-0">Recent Predictions</h3>
+      <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 shrink-0 flex flex-col" style={{ height: "210px" }}>
+        <h3 className="text-slate-100 text-xs font-semibold mb-2 shrink-0">Recent Predictions</h3>
         <div className="flex-1 overflow-y-auto min-h-0">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-[#10151D]">
