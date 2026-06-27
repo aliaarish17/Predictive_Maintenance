@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { getHistory } from "../../services/api";
+import { pageTransition } from "../../animations/pageTransition";
 
 // Risk level styles
 const riskColor = {
@@ -19,7 +21,7 @@ export default function History() {
   useEffect(() => {
     setLoading(true);
     getHistory({
-      limit: 100,
+      limit: 25,
       ...(riskFilter && { risk_level: riskFilter }),
       ...(typeFilter && { prediction_type: typeFilter }),
     })
@@ -56,7 +58,13 @@ export default function History() {
   }
 
   return (
-    <div className="p-8 max-w-[1240px] mx-auto">
+    <motion.div
+    variants={pageTransition}
+    initial="hidden"
+    animate="visible"
+    exit="exit">
+
+    <div className="p-8  bg-[#0B131A] overflow-x-hidden ">
 
       {/* Header */}
       <h2 className="text-slate-100 text-2xl font-semibold mb-1">Prediction History</h2>
@@ -88,7 +96,7 @@ export default function History() {
         {(riskFilter || typeFilter) && (
           <button
             onClick={() => { setRiskFilter(""); setTypeFilter(""); }}
-            className="text-slate-400 text-sm border border-[#1E2733] rounded-lg px-3 py-2 hover:text-slate-200"
+            className="text-black-400 text-sm  border border-[#1E2733] rounded-lg px-3 py-2 hover:text-slate-200"
           >
             Clear
           </button>
@@ -100,7 +108,7 @@ export default function History() {
       </div>
 
       {/* Table */}
-      <div className="bg-[#10151D] border border-[#1E2733] rounded-xl overflow-hidden">
+      <div className="bg-[#10151D] max-h-[500px] p-3 overflow-x-hidden overflow-y-auto border border-[#1E2733] rounded-xl overflow-hidden">
 
         {/* Loading / Error / Empty states */}
         {loading && <p className="text-slate-400 p-8">Loading...</p>}
@@ -141,5 +149,6 @@ export default function History() {
         )}
       </div>
     </div>
+    </motion.div>
   );
 }

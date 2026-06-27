@@ -32,10 +32,10 @@ function Form({ onSubmit, loading }) {
 
   return (
  
-    <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-5">
+    <div className="bg max-w-[800px] border border-[#243647] rounded-xl p-5">
         
 <div className="col-span-2">
-  <label className="block text-slate-400 text-xs uppercase mb-1.5">
+  <label className="block text-[#94A3B8] text-xs uppercase mb-1.5">
     Machine Name <span className="text-slate-500">(optional)</span>
   </label>
   <input
@@ -72,7 +72,7 @@ function Form({ onSubmit, loading }) {
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="w-full bg-cyan-400 text-[#001016] font-semibold py-3 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed hover:bg-cyan-300 transition-colors"
+        className="w-full cursor-pointer bg-gradient-to-r from-white via-emerald-500 to-emerald-600 text-[#0B131A] font-semibold py-3 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed hover:bg-cyan-300 transition-w-full mt-6 py-3.5 px-4 font-bold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-white via-emerald-400 to-emerald-600 text-[#0B131A] shadow-[0_0_20px_rgba(52,211,153,0.3)]"
       >
         {loading ? "Predicting..." : "Run Prediction"}
       </button>

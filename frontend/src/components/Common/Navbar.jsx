@@ -1,16 +1,24 @@
 import React from 'react'
 import logo from '../../assets/logo.svg'
-import { Link,NavLink } from 'react-router-dom'
+import { Link,NavLink,useLocation } from 'react-router-dom'
 
 
 export default function Navbar() {
+    const location = useLocation()
+    
   return (
     <>
-    <div className=' sticky flex flex-row justify-between  w-full h-auto bg-[#F8FAFC] border-2 border-[#E2E8F0]'>
+    <div
+  className={`fixed top-0 left-0 w-full z-50 flex justify-between ${
+    location.pathname === "/home"
+      ? "bg-black/30 backdrop-blur-md border-b border-white/10"
+      : "bg-[#F8FAFC] border-b border-[#E2E8F0]"
+  }`}
+>
     <div className='pt-3 pb-2 pr-3 pl-2'>
      <Link to="/" className='flex flex-row items-center gap-3'>
       <img className='w-8 h-8' src={logo} alt="Logo" />
-      <p className='text-[#0F172A] font-bold leading-tight'>
+      <p className='text-white font-bold leading-tight'>
         PREDICTIVE <br/>
         <span className='text-[#059669]'>MAINTENANCE</span> 
       </p>
@@ -22,7 +30,7 @@ export default function Navbar() {
                 <li>
                     <NavLink
                     to="/home"
-                    className={({isActive})=> `block font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-[#0F172A]"} hover:text-[#059669] transition-all ease-in-out  `
+                    className={({isActive})=> `block font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-white"} hover:text-[#059669] transition-all ease-in-out  `
                     }
                     > Home
                     </NavLink>
@@ -32,7 +40,7 @@ export default function Navbar() {
                 <li>
                     <NavLink
                     to="/dashboard"
-                    className={({isActive})=> `block font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-[#0F172A]"} hover:text-[#059669] transition-all ease-in-out `
+                    className={({isActive})=> `block font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-white"} hover:text-[#059669] transition-all ease-in-out `
                     }
                     >
                         Dashboard
@@ -44,7 +52,7 @@ export default function Navbar() {
                 <li>
                     <NavLink
                     to="/machines"
-                    className={({isActive})=> `block font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-[#0F172A]"} hover:text-[#059669] transition-all ease-in-out  `
+                    className={({isActive})=> `block font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-white"} hover:text-[#059669] transition-all ease-in-out  `
                     }
                     >
                         Machine
@@ -56,7 +64,7 @@ export default function Navbar() {
                 <li>
                     <NavLink
                     to="/predict"
-                    className={({isActive})=> `block font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-[#0F172A]"} hover:text-[#059669] transition-all ease-in-out `
+                    className={({isActive})=> `block font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-white"} hover:text-[#059669] transition-all ease-in-out `
                     }
                     >
                         Predict
@@ -68,7 +76,7 @@ export default function Navbar() {
                 <li>
                     <NavLink
                     to="/history"
-                    className={({isActive})=> `block transition-all ease-in-out font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-[#0F172A]"} hover:text-[#059669] transition-all ease-in-out `
+                    className={({isActive})=> `block transition-all ease-in-out font-bold py-2 pr-4 pl-3 duration-200 ${isActive? "text-[#059669]":"text-white"} hover:text-[#059669] transition-all ease-in-out `
                     }
                     >
                         History

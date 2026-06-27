@@ -1,8 +1,10 @@
 // Dashboard.jsx
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { getHistory } from "../../services/api";
 import FailureTrendChart from "./FailureTrendChart";
 import MPie from "./Pie";
+import { pageTransition } from "../../animations/pageTransition";
 
 const RISK_SCORE = { high: 100, medium: 50, low: 10 };
 
@@ -74,6 +76,12 @@ function Dashboard() {
   ];
 
   return (
+    <motion.div
+    variants={pageTransition}
+    initial="hidden"
+    animate="visible"
+    exit="exit">
+
     <div className="h-[calc(100vh-64px)] flex flex-col p-6 max-w-[1400px] mx-auto overflow-hidden">
       <h2 className="text-slate-100 text-xl font-semibold mb-4 flex-shrink-0">Fleet Overview</h2>
 
@@ -143,6 +151,7 @@ function Dashboard() {
         </div>
       </div>
     </div>
+    </motion.div>
   );
 }
 

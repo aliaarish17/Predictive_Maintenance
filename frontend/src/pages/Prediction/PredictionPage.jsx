@@ -5,6 +5,9 @@ import Form from "./Form";
 import PredictionPanel from "./PredictionPanel";
 import ShapChart from "./ShapChart";
 import AIExplanation from "./AIExplanation";
+import { pageTransition } from "../../animations/pageTransition";
+import { motion } from "motion/react";
+
 
 function PredictionPage() {
   const [prediction, setPrediction] = useState(null);
@@ -25,29 +28,38 @@ function PredictionPage() {
   };
 
   return (
-    <div className="p-8 max-w-[1240px] mx-auto">
-      <h2 className="text-slate-100 text-2xl font-semibold mb-2">Predict by Input</h2>
-      <p className="text-slate-400 text-sm mb-6">
-        AI4I 2020 dataset — manually enter sensor readings to classify breakdown risk.
-      </p>
+    <motion.div
+    variants={pageTransition}
+    initial="hidden"
+    animate="visible"
+    exit="exit">
 
-      <div className="mb-6">
-        <Form onSubmit={handleSubmit} loading={loading} />
-      </div>
-
-      {error && <p className="text-red-500 text-sm mb-5">{error}</p>}
-
-      {prediction && (
-        <div className="space-y-4">
-          <PredictionPanel prediction={prediction} />
-          <div className="grid grid-cols-2 gap-4">
-            <ShapChart shapValues={prediction.shap_values} />
-            <AIExplanation text={prediction.ai_explanation} />
-          </div>
+      <div className="p-8 w-full h-screen
+       bg-[#0B131A] ">
+        <h2 className="text-slate-100 text-2xl font-semibold mb-2">Predict by Input</h2>
+        <p className="text-slate-400 text-sm mb-6">
+          AI4I 2020 dataset — manually enter sensor readings to classify breakdown risk.
+        </p>
+  
+        <div className="mb-6">
+          <Form onSubmit={handleSubmit} loading={loading} />
         </div>
-      )}
-    </div>
-  );
-}
-
-export default PredictionPage;
+  
+        {error && <p className="text-red-500 text-sm mb-5">{error}</p>}
+  
+        {prediction && (
+          <div className="space-y-4">
+            <PredictionPanel prediction={prediction} />
+            <div className="grid grid-cols-2 gap-4">
+              <ShapChart shapValues={prediction.shap_values} />
+              <AIExplanation text={prediction.ai_explanation} />
+            </div>
+          </div>
+        )}
+      </div>
+       </motion.div>
+    );
+  }
+  
+  export default PredictionPage;
+   

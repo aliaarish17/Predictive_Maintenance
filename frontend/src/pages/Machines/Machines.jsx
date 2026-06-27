@@ -5,6 +5,8 @@ import { predictRUL } from "../../services/api";
 import { DUMMY_MACHINE_SENSORS, MACHINE_UNITS, UNIT_RISK_HINT } from "../../data/Sensor";
 import MachineCard from "./MachineCard";
 import { data } from "react-router-dom";
+import { motion } from "motion/react";
+import { pageTransition } from "../../animations/pageTransition";
 
 const RISK = {
   high: 
@@ -132,6 +134,12 @@ export default function Machines() {
  }
 
   return (
+    <motion.div
+    variants={pageTransition}
+    initial="hidden"
+    animate="visible"
+    exit="exit">
+
     <div className="p-8 max-w-[1240px] mx-auto">
 
       {/* Page header */}
@@ -351,5 +359,6 @@ export default function Machines() {
         </>
       )}
     </div>
+    </motion.div>
   );
 }
