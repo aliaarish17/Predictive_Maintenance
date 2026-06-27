@@ -39,10 +39,10 @@ export default function MPie({ data }) {
         </div>
       </div>
 
-      <div className="shrink-0 flex justify-center gap-3 mt-2 flex-wrap">
+      <div className="flex-shrink-0 flex justify-center gap-3 mt-2 flex-wrap">
         {data.map((item, i) => (
           <div key={i} className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: item.color }}></span>
+            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: item.color }}></span>
             <span className="text-slate-400 text-[11px] whitespace-nowrap">
               {item.name} <span className="text-slate-300">({item.value})</span>
             </span>

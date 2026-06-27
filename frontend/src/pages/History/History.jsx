@@ -64,7 +64,7 @@ export default function History() {
     animate="visible"
     exit="exit">
 
-    <div className="p-8  bg-[#0B131A] overflow-x-hidden ">
+    <div className="pt-19 px-20 min-h-screen bg-[#0B131A] overflow-x-hidden ">
 
       {/* Header */}
       <h2 className="text-slate-100 text-2xl font-semibold mb-1">Prediction History</h2>

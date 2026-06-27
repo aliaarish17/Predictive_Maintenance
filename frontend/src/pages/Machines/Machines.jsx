@@ -100,7 +100,7 @@ export default function Machines() {
     hintRisk = "low"; //use "low " as defalt if risk nhi mila toh
  }
 
-  const risk          = prediction ? RISK[prediction.risk_level] : RISK[hintRisk]; //if prediction comes from backend then we'll use risk_level else dummy level
+  const risk = prediction ? RISK[prediction.risk_level] : RISK[hintRisk]; //if prediction comes from backend then we'll use risk_level else dummy level
 
   const sensorEntries = Object.entries(DUMMY_MACHINE_SENSORS[selectedUnit]); // converts value to array
   
@@ -140,7 +140,7 @@ export default function Machines() {
     animate="visible"
     exit="exit">
 
-    <div className="p-8 max-w-[1240px] mx-auto">
+    <div className="pt-19 px-20 bg-[#10151D] min-h-screen mx-auto">
 
       {/* Page header */}
       <div className="mb-6">
@@ -168,15 +168,15 @@ export default function Machines() {
           </select>
         </div>
 
-        <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${RISK[hintRisk].border} ${RISK[hintRisk].bg}`}>
+        {/* <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${RISK[hintRisk].border} ${RISK[hintRisk].bg}`}>
           <span className={`w-2 h-2 rounded-full ${RISK[hintRisk].dot}`} />
           <span className={`text-xs font-bold ${RISK[hintRisk].text}`}>{RISK[hintRisk].label}</span>
-        </div>
+        </div> */}
 
         <button
           onClick={handleLoadHistory}
           disabled={loading}
-          className="bg-cyan-400 text-[#001016] font-semibold px-5 py-2.5 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyan-300 transition-colors"
+          className="h-[32px] cursor-pointer bg-gradient-to-r from-white via-emerald-500 to-emerald-600 text-[#0B131A] font-semibold rounded-lg disabled:opacity-60 disabled:cursor-not-allowed hover:bg-cyan-300 transition-w-full px-4 font-bold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-white via-emerald-400 to-emerald-600 text-[#0B131A] shadow-[0_0_20px_rgba(52,211,153,0.3)]"
         >
           
           {loading ? "Running..." : "Run Prediction"}
@@ -279,7 +279,7 @@ export default function Machines() {
                   <div className="flex flex-col gap-3">
                     {actions.map((action, i) => (
                       <div key={i} className="flex items-start gap-3">
-                        <span className="text-base leading-none mt-0.5 shrink-0">{ACTION_ICON[i] ?? "•"}</span>
+                        <span className="text-base leading-none mt-0.5 flex-shrink-0">{ACTION_ICON[i] ?? "•"}</span>
                         <span className="text-slate-400 text-sm leading-snug">{action}</span>
                       </div>
                     ))}

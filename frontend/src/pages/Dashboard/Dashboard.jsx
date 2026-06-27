@@ -57,8 +57,8 @@ function Dashboard() {
     ? (rulPredictions.reduce((sum, p) => sum + p.result.rul_cycles, 0) / rulPredictions.length).toFixed(1)
     : 0;
 
-  const today = new Date().toISOString().split("T")[0];
-  const todayCount = predictions.filter((p) => p.created_at.startsWith(today)).length;
+ const today = new Date().toLocaleDateString("en-CA"); // gives YYYY-MM-DD in local time
+const todayCount = predictions.filter((p) => p.created_at.startsWith(today)).length;
 
   // Sirf most recent 6 — table mein dikhane ke liye, naya-se-purana
   const recentPredictions = predictions
@@ -82,12 +82,16 @@ function Dashboard() {
     animate="visible"
     exit="exit">
 
-    <div className="h-[calc(100vh-64px)] flex flex-col p-6 max-w-[1400px] mx-auto overflow-hidden">
-      <h2 className="text-slate-100 text-xl font-semibold mb-4 shrink-0">Fleet Overview</h2>
+    <div className="h-screen pt-17 flex flex-col bg-[#0A0E14] px-21 py-6 w-full mx-auto overflow-hidden">
+      <div className="mb-3">
+      <h2 className="text-white text-xl font-semibold  flex-shrink-0">Dashboard</h2>
+      <p className="text-slate-200">Overview of Machine Health and Predictions</p>
+
+      </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-3 mb-3 shrink-0">
-        <KpiCard label="Machines Monitored" value={uniqueMachines} />
+      <div className="grid grid-cols-4 gap-3 mb-3 flex-shrink-0">
+        <KpiCard label="Machines Monitored" colorClass="text-white" value={uniqueMachines} />
         <KpiCard label="High Breakdown Risk" value={highRiskCount} colorClass="text-red-500" />
         <KpiCard label="Avg Life Remaining" value={`${avgRUL} cycles`} colorClass="text-amber-500" />
         <KpiCard label="Predictions Today" value={todayCount} colorClass="text-emerald-400" />
@@ -96,14 +100,14 @@ function Dashboard() {
       {/* Middle row — chart + pie */}
       <div className="grid grid-cols-[1.7fr_1fr] gap-3 mb-3 flex-1 min-h-0">
         <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 flex flex-col min-h-0">
-          <h3 className="text-slate-100 text-xs font-semibold mb-2 shrink-0">Failure Risk Trend</h3>
-          <div className="flex-1 min-h-0">
+          <h3 className="text-slate-100 text-xs font-semibold mb-2 flex-shrink-0">Failure Risk Trend</h3>
+          <div className="flex-1 pb-3.5 h-[180px]">
             <FailureTrendChart data={trendData} />
           </div>
         </div>
 
         <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 flex flex-col min-h-0">
-          <h3 className="text-slate-100 text-xs font-semibold mb-3 shrink-0">Machine Health Distribution</h3>
+          <h3 className="text-slate-100 text-xs font-semibold mb-3 flex-shrink-0">Machine Health Distribution</h3>
           <div className="flex-1 min-h-0">
             <MPie data={pieData} />
           </div>
@@ -111,8 +115,8 @@ function Dashboard() {
       </div>
 
       {/* Bottom — Recent Predictions table */}
-      <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 shrink-0 flex flex-col" style={{ height: "210px" }}>
-        <h3 className="text-slate-100 text-xs font-semibold mb-2 shrink-0">Recent Predictions</h3>
+      <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4 flex-shrink-0 flex flex-col" style={{ height: "210px" }}>
+        <h3 className="text-slate-100 text-xs font-semibold mb-2 flex-shrink-0">Recent Predictions</h3>
         <div className="flex-1 overflow-y-auto min-h-0">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-[#10151D]">
@@ -157,10 +161,15 @@ function Dashboard() {
 
 function KpiCard({ label, value, colorClass = "text-slate-100" }) {
   return (
-    <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-4">
-      <div className="text-slate-400 text-[11px] uppercase tracking-wide">{label}</div>
-      <div className={`${colorClass} text-2xl font-semibold mt-2`}>{value}</div>
-    </div>
+    <motion.div 
+    whileHover={{
+      scale:1.08, y:2
+    }}
+    transition={{}}
+    className=" cursor-pointer border bg-[#10151D] border-[#1E2733] rounded-xl p-4">
+      <div className="text-white text-[11px] uppercase tracking-wide">{label}</div>
+      <div className={`${colorClass}  text-2xl font-semibold mt-2`}>{value}</div>
+    </motion.div>
   );
 }
 

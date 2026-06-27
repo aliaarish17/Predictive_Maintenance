@@ -90,9 +90,12 @@ const itemVariants = {
       className='relative z-10 h-screen flex flex-col top-0.5  justify-center bottom-12 items-start px-20'>
       <motion.h1
           variants={itemVariants}
-          className="text-6xl mt-7 text-white font-bold"
+          className="text-6xl mt-7  hover:to-green-300 text-white font-bold"
         >
-        AI-Powered <br />
+          <span
+          className='text-white transition-colors duration-300 hover:bg-gradient-to-r hover:from-green-400 hover:to-emerald-400 hover:bg-clip-text hover:text-transparent cursor-pointer'>
+         AI-Powered <br />
+          </span>
         <span className="text-green-500 text-5xl">
          Predictive Maintenance
         </span>
