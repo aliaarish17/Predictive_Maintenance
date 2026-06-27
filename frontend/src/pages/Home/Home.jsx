@@ -4,12 +4,23 @@ import bgImage from "../../assets/bg.jpg"
 import FeatureCard from '../../components/UI/FeatureCard'
 import { useNavigate } from 'react-router-dom'
 import { delay, motion } from "motion/react"
-
+import download from "../../assets/download.png"
+import analytics from "../../assets/analytics.png"
+import trend from "../../assets/trend.png"
 
 
 
 export default function Home() {
   const navigate = useNavigate()
+
+  //documentation download:
+    const handleDownload= ()=>{
+      const link = document.createElement('a')
+      link.href = '/docs/Technical_doc.pdf'
+      link.download = 'Technical_doc.pdf'
+      link.click();
+  }
+  
   const containerVariants = {
   hidden: {},
   visible: {
@@ -103,7 +114,7 @@ const itemVariants = {
 
     <motion.p
      variants={itemVariants}
-     className="text-white mt-4 text-xl font-bold max-w-2xl">
+     className="text-white mt-4 text-xl font-bold max-w-2xl cursor-pointer">
        Predict machine failure before they happen and maximise equipment uptime with AI
     </motion.p>
 
@@ -116,6 +127,7 @@ const itemVariants = {
       whileHover={{
         y: -8,
         scale: 1.03,
+        
       }}
       transition={{ duration: 0.2 }}
     >
@@ -136,22 +148,27 @@ const itemVariants = {
       whileTap={{
         scale: 0.9,y:1
       }}
-      className="border-white  hover:border-green-800  cursor-pointer hover:bg-green-600 px-7 py-3 mt-6 rounded-xl text-white font-bold bg-green-500"
+      className="border-white flex flex-row items-start gap-4 hover:border-green-800  cursor-pointer hover:bg-green-600 px-7 py-3 mt-6 rounded-xl text-black hover:text-white font-bold bg-green-500"
     >
       Launch Dashboard 
+      <img className='h-6 w-6 ' src={trend}/>
     </motion.button>
   </Link>
 
   <motion.button
+  onClick={handleDownload}
       whileHover={{
-        scale: 1.05,y:-2
+        scale: 1.05,y:-2,
+        
+
       }}
       whileTap={{
         scale: 0.9,y:1
       }}
-      className="border-white cursor-pointer hover:bg-green-600 px-7 py-3 mt-6 rounded-xl text-white font-bold bg-green-500"
+      className="flex flex-row items-end gap-3 border-white cursor-pointer hover:bg-green-600 px-3 py-3 mt-6 rounded-xl hover:text-white font-bold bg-green-500"
     >
-      How it Works 
+      How it works?
+      <img className='h-6 w-6 'src={download}/>
     </motion.button>
 </motion.div>
 

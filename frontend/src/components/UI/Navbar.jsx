@@ -1,6 +1,7 @@
 import React from 'react'
 import logo from '../../assets/logo.svg'
 import { Link,NavLink,useLocation } from 'react-router-dom'
+import {motion} from "motion/react"
 
 
 export default function Navbar() {
@@ -17,7 +18,9 @@ export default function Navbar() {
 >
     <div className='pt-3 pb-2 pr-3 pl-2'>
      <Link to="/" className='flex flex-row items-center gap-3'>
-      <img className='w-8 h-8' src={logo} alt="Logo" />
+      <motion.div
+      whileHover={{rotate:360}}>
+        <img className='w-10 h-10 ' src={logo}/></motion.div>
       <p className=' font-bold leading-tight'>
         PREDICTIVE <br/>
         <span className='text-[#059669]'>MAINTENANCE</span> 
