@@ -27,6 +27,8 @@ function PredictionPage() {
     }
   };
 
+   
+
   return (
     <motion.div
     variants={pageTransition}
