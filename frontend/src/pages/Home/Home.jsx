@@ -177,7 +177,7 @@ const itemVariants = {
   className="mt-10 flex flex-row  gap-6 max-w-[720px]"
 >
   <div className="bg-white/10 backdrop-blur-md hover:scale-[1.2] hover:border-green-800 hover:y-[-8] duration-200 ease-in cursor-pointer rounded-xl p-4 border border-white/10">
-    <p className="text-green-400 font-bold">94%</p>
+    <p className="text-green-400 font-bold">97%</p>
     <p className="text-white text-sm">Prediction Accuracy</p>
   </div>
 

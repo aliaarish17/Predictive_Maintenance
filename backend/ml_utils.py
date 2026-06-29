@@ -82,7 +82,7 @@ def predict_rul(sensor_readings: dict):
         for feat, val in sorted(zip(RUL_FEATURES, shap_vals[0]), key=lambda x: -abs(x[1]))[:6]
     ]
 
-    risk = "high" if rul_cycles < 20 else "medium" if rul_cycles < 60 else "low"
+    risk = "high" if rul_cycles < 45 else "medium" if rul_cycles < 100 else "low"
     return {
         "result": {"rul_cycles": round(rul_cycles, 1)},
         "shap_values": shap_list,

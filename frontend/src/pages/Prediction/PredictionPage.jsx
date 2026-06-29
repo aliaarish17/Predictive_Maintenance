@@ -18,7 +18,11 @@ function PredictionPage() {
     setError(null);
     try {
       const response = await predictFailure(formData);
+     
+      
       setPrediction(response.data);
+      
+      
     } catch (err) {
       setError("Prediction failed. Check backend connection.");
     } finally {

@@ -37,8 +37,9 @@ const RISK = {
 const ACTION_ICON = ["🔍", "🔧", "📋"]; 
 
 function getRulTrend(rul) {
-  if (rul >= 60) return { label: "Healthy", color: "text-emerald-400" };
-  if (rul >= 20) return { label: "Declining", color: "text-amber-400" };
+  if (rul >= 100) return { label: "Healthy", color: "text-emerald-400" };
+  if (rul >= 45
+  ) return { label: "Declining", color: "text-amber-400" };
   return { label: "Critical", color: "text-red-400" };
 }
 
