@@ -1,4 +1,3 @@
-// src/pages/Machines/Machines.jsx
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { predictRUL } from "../../services/api";

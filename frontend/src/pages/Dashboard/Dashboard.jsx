@@ -1,4 +1,3 @@
-// Dashboard.jsx
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { getHistory } from "../../services/api";

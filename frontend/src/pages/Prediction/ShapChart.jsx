@@ -1,4 +1,3 @@
-// src/pages/Prediction/ShapChart.jsx
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 function ShapChart({ shapValues }) {

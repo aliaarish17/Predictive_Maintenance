@@ -1,4 +1,3 @@
-# routers/history.py
 from fastapi import APIRouter, Query
 from database import get_history
 

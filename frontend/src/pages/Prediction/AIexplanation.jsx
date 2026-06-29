@@ -1,5 +1,4 @@
 
-
 const ACTION_ICON = ["🔍", "🔧", "📋"];
 
 function parseExplanation(text) {

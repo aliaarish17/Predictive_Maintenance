@@ -1,4 +1,3 @@
-// Pie.jsx
 import React from 'react'
 import { Pie, PieChart, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 

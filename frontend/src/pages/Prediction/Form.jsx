@@ -1,4 +1,3 @@
-// src/pages/Prediction/Form.jsx
 import { useState } from "react";
 
 const INITIAL_FORM = {

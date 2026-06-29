@@ -1,4 +1,3 @@
-// src/pages/Prediction/PredictionPage.jsx
 import { useState } from "react";
 import { predictFailure } from "../../services/api";
 import Form from "./Form";

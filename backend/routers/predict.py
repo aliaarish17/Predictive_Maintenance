@@ -1,4 +1,3 @@
-# routers/predict.py
 from fastapi import APIRouter, HTTPException
 from schemas import FailureInput, RULInput, PredictionResponse
 from ml_utils import predict_failure, predict_rul

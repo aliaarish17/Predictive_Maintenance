@@ -1,4 +1,3 @@
-// src/pages/Dashboard/FailureTrendChart.jsx
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label } from "recharts";
 
 function FailureTrendChart({ data }) {

@@ -1,4 +1,3 @@
-// src/pages/Machines/MachineCard.jsx
 function MachineCard({ title, children }) {
   return (
     <div className="bg-[#10151D] border border-[#1E2733] rounded-xl p-5">

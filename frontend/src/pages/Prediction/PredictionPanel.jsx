@@ -1,4 +1,3 @@
-// src/pages/Prediction/PredictionPanel.jsx
 
 const RISK_STYLES = {
   high: { text: "text-red-500", bg: "bg-red-500/15", border: "border-red-500/30", gradient: "from-red-500/10" },

@@ -1,4 +1,3 @@
-# ai_explain.py
 from google import genai
 from config import settings
 
