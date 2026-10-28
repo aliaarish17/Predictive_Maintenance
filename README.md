@@ -374,3 +374,45 @@ CREATE TABLE IF NOT EXISTS predictions (
       # Dynamic parameterized query construction
       ...
   ```
+
+
+---
+
+## 8. Frontend Architecture & User Interface
+
+The frontend is constructed with React 19, Vite, and Tailwind CSS, following a modular component architecture with client-side routing.
+
+### 8.1 Page Routing & Views (`src/main.jsx`)
+
+The user interface is structured around five primary routes managed by `createBrowserRouter`:
+
+| Route | Component | Key Responsibilities |
+|---|---|---|
+| `/home` | `Home.jsx` | Landing screen showcasing industrial monitoring capabilities, architectural breakdown, and quick action pathways. |
+| `/dashboard` | `Dashboard.jsx` | Executive overview displaying 4 key metrics (Monitored Machines, High Risk Count, Average RUL, Today's Inferences), a 5-point rolling average risk trend AreaChart, a fleet risk distribution PieChart, and a live recent predictions table. |
+| `/predict` | `PredictionPage.jsx` | Failure diagnostic portal. Contains a 5-parameter numerical input form (`Form.jsx`), a real-time risk assessment badge (`PredictionPanel.jsx`), a horizontal SHAP attribution chart (`ShapChart.jsx`), and the Gemini root-cause explanation box (`AIexplanation.jsx`). |
+| `/machines` | `Machines.jsx` | Turbofan engine health monitor. Allows technicians to select specific engine units (`Unit_1` through `Unit_10`), view loaded multi-sensor readings, execute RUL regressions, visualize remaining cycles inside a circular gauge, and review component-level SHAP attributions. |
+| `/history` | `History.jsx` | Comprehensive audit log displaying past machine evaluations with filters for prediction type (`failure`, `rul`) and risk tier (`all`, `high`, `medium`, `low`). |
+
+### 8.2 Core Visual Components
+
+#### Horizontal SHAP Attribution Chart (`src/pages/Prediction/ShapChart.jsx`)
+* Built with Recharts `BarChart` in vertical layout.
+* Maps feature attributions directly to visual impact colors:
+  * **Red (`#f87171`)**: Positive SHAP value indicating a feature driving failure probability upward.
+  * **Cyan (`#22d3ee`)**: Negative SHAP value indicating a feature stabilizing equipment condition.
+* Responsive tooltip displays exact Shapley values up to 4 decimal places.
+
+#### Circular RUL Gauge (`src/pages/Machines/Machines.jsx`)
+* Custom SVG radial gauge displaying predicted remaining operating cycles centered with real-time risk-colored ring borders.
+* Automatically marks equipment status as **Critical** ($< 45$ cycles), **Degrading** ($45 - 99$ cycles), or **Nominal** ($\ge 100$ cycles).
+
+### 8.3 Risk-Responsive Design System
+
+The visual design system enforces immediate cognitive clarity by propagating risk state across text, borders, and backgrounds:
+
+| Risk Tier | UI Badge | Border Class | Text Class | Background Accent |
+|---|---|---|---|---|
+| **High** | `CRITICAL RISK` | `border-red-500` | `text-red-400` | `bg-red-500/10` |
+| **Medium** | `WARNING / MODERATE` | `border-amber-500` | `text-amber-400` | `bg-amber-500/10` |
+| **Low** | `HEALTHY / NOMINAL` | `border-emerald-500` | `text-emerald-400` | `bg-emerald-500/10` |
