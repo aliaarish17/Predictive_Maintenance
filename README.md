@@ -518,3 +518,140 @@ In the frontend terminal:
 npm run dev
 ```
 The terminal will display the local Vite server URL (typically `http://localhost:5173` or `http://localhost:5174`). Open this URL in any modern web browser to access the application.
+
+
+---
+
+## 10. Repository Directory Structure
+
+```
+Predictive_Maintenance/
+│
+├── backend/
+│   ├── data/
+│   │   ├── ai4i2020.csv              # AI4I 2020 failure classification dataset (10,000 records)
+│   │   ├── train_FD001.txt           # NASA CMAPSS run-to-failure turbofan training dataset
+│   │   ├── test_FD001.txt            # CMAPSS test split sensor trajectories
+│   │   └── RUL_FD001.txt             # True RUL target labels for test engines
+│   │
+│   ├── ml/
+│   │   ├── train_failure.py          # Script to train XGBoost failure classifier
+│   │   └── train_rul.py              # Script to train XGBoost RUL regressor and fit MinMaxScaler
+│   │
+│   ├── models/
+│   │   ├── failure_model.pkl         # Serialized XGBoost classification model
+│   │   ├── rul_model.pkl             # Serialized XGBoost regression model
+│   │   └── rul_scaler.pkl            # Serialized MinMaxScaler object
+│   │
+│   ├── routers/
+│   │   ├── __init__.py
+│   │   ├── predict.py                # POST /predict/failure and POST /predict/rul routes
+│   │   └── history.py                # GET /history route with parameter filtering
+│   │
+│   ├── ai_explain.py                 # Google Gemini 2.5 Flash SDK integration & prompt handler
+│   ├── config.py                     # Pydantic Settings reading .env configurations
+│   ├── database.py                   # SQLite connection, DDL migration, and IST persistence engine
+│   ├── main.py                       # FastAPI application entry point, CORS, and lifespan handler
+│   ├── ml_utils.py                   # Model inference pipelines and SHAP TreeExplainer routines
+│   ├── requirements.txt              # Backend Python dependencies
+│   ├── schemas.py                    # Pydantic validation models for input/output contracts
+│   └── predictive_maintenance.db     # SQLite persistence store (auto-generated)
+│
+├── frontend/
+│   ├── public/                       # Static public assets
+│   ├── src/
+│   │   ├── animations/
+│   │   │   └── pageTransition.js     # Framer Motion entrance/exit variants
+│   │   ├── assets/                   # Static imagery and SVG icons
+│   │   ├── components/
+│   │   │   └── UI/
+│   │   │       ├── FeatureCard.jsx   # Interactive landing page capability cards
+│   │   │       └── Navbar.jsx        # Navigation bar across routes
+│   │   ├── data/
+│   │   │   └── Sensor.js             # Preloaded CMAPSS engine unit sensor readings
+│   │   ├── pages/
+│   │   │   ├── Dashboard/
+│   │   │   │   ├── Dashboard.jsx     # Fleet metrics, rolling risk trend, risk distribution
+│   │   │   │   ├── FailureTrendChart.jsx # AreaChart for rolling risk averages
+│   │   │   │   └── Pie.jsx           # Risk categorization PieChart
+│   │   │   ├── History/
+│   │   │   │   └── History.jsx       # Historical query log table with search and filtering
+│   │   │   ├── Home/
+│   │   │   │   └── Home.jsx          # Architecture and capability landing view
+│   │   │   ├── Machines/
+│   │   │   │   ├── MachineCard.jsx   # Engine status and telemetry overview card
+│   │   │   │   └── Machines.jsx      # Turbofan RUL predictor, gauge, and SHAP explainer
+│   │   │   └── Prediction/
+│   │   │       ├── AIexplanation.jsx # Gemini root-cause analysis and actions block parser
+│   │   │       ├── Form.jsx          # 5-feature input form for machine failure diagnostics
+│   │   │       ├── PredictionPage.jsx# Failure diagnostic portal layout
+│   │   │       ├── PredictionPanel.jsx # Breakdown risk status badge and confidence gauge
+│   │   │       └── ShapChart.jsx     # Horizontal SHAP attribution bar chart
+│   │   ├── services/
+│   │   │   └── api.js                # Centralized Axios HTTP client instance
+│   │   ├── Layout.jsx                # Global navigation shell and page transition wrapper
+│   │   ├── index.css                 # Global styling and Tailwind directives
+│   │   └── main.jsx                  # React application root and router declarations
+│   ├── package.json                  # Node dependencies and build scripts
+│   ├── vite.config.js                # Vite build and plugin configurations
+│   └── index.html                    # Single-page HTML shell
+│
+└── README.md                         # Project technical documentation
+```
+
+---
+
+## 11. End-to-End Operational Flow
+
+When a technician performs an evaluation on the frontend, the platform executes the following 10-step lifecycle:
+
+```
+[1. User Action]      Technician inputs sensor parameters in React UI and clicks 'Run Prediction'.
+       ↓
+[2. Form Trigger]     React updates local component state (loading=true, error=null).
+       ↓
+[3. Axios Call]       src/services/api.js dispatches an HTTP POST request to FastAPI backend.
+       ↓
+[4. Schema Check]     FastAPI validates incoming JSON payload against Pydantic schema (FailureInput / RULInput).
+       ↓
+[5. ML Inference]     ml_utils.py formats input into a DataFrame and invokes model.predict_proba() or model.predict().
+       ↓
+[6. SHAP Attribution] Pre-cached TreeExplainer calculates marginal feature contributions and extracts the top 6 factors.
+       ↓
+[7. Risk Evaluation]  Calculated probability or RUL cycles determine risk level ('low', 'medium', or 'high').
+       ↓
+[8. Gemini Analysis]  If risk is medium or high, prompt is sent to Google Gemini 2.5 Flash for root-cause synthesis and corrective actions.
+       ↓
+[9. DB Persistence]   database.py inserts full audit record with an IST timestamp into SQLite predictions table.
+       ↓
+[10. DOM Render]      FastAPI returns PredictionResponse JSON. React renders the risk badge, SHAP bar chart, and AI action checklist.
+```
+
+---
+
+## 12. Troubleshooting & FAQ
+
+#### Missing Machine Learning Models
+* **Symptom**: `FileNotFoundError: models/failure_model.pkl` on backend launch.
+* **Resolution**: Run `python ml/train_failure.py` and `python ml/train_rul.py` from within the `backend/` directory to regenerate all serialized artifacts.
+
+#### CORS (Cross-Origin Resource Sharing) Block
+* **Symptom**: Browser console indicates `Cross-Origin Request Blocked`.
+* **Resolution**: Ensure the frontend dev server port matches one of the origins specified in `backend/config.py` (`http://localhost:5173`, `http://localhost:5174`, or `http://localhost:3000`). Update `settings.cors_origins` in `config.py` if your frontend runs on a custom port.
+
+#### Gemini API Quota or Connection Failures
+* **Symptom**: Prediction succeeds, but the explanation displays a fallback notice.
+* **Resolution**: Verify that `GEMINI_API_KEY` is present in `backend/.env` and valid. If quotas are exceeded, the built-in fallback handler ensures predictions continue operating without throwing a 500 error.
+
+#### SQLite Database Locking
+* **Symptom**: `sqlite3.OperationalError: database is locked`.
+* **Resolution**: Ensure database connections are acquired exclusively through the `get_db()` context manager, which handles deterministic closing of connections upon completion.
+
+---
+
+## 13. Project Metadata & Contributions
+
+* **Author**: Aarish Ali
+* **Project**: Industrial Predictive Maintenance Platform
+* **Repository**: [https://github.com/aliaarish17/Predictive_Maintenance](https://github.com/aliaarish17/Predictive_Maintenance)
+* **License**: MIT
