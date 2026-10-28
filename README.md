@@ -416,3 +416,105 @@ The visual design system enforces immediate cognitive clarity by propagating ris
 | **High** | `CRITICAL RISK` | `border-red-500` | `text-red-400` | `bg-red-500/10` |
 | **Medium** | `WARNING / MODERATE` | `border-amber-500` | `text-amber-400` | `bg-amber-500/10` |
 | **Low** | `HEALTHY / NOMINAL` | `border-emerald-500` | `text-emerald-400` | `bg-emerald-500/10` |
+
+
+---
+
+## 9. Installation & Execution Guide
+
+Follow these sequential steps to install dependencies, configure environment secrets, train machine learning models, and launch both frontend and backend development servers.
+
+### 9.1 System Prerequisites
+
+* **Operating System**: Windows 10/11, macOS, or Linux
+* **Python**: Version 3.10, 3.11, or 3.12 installed
+* **Node.js**: Version 18.x or 20.x (LTS recommended) with `npm`
+* **Git**: Installed and configured
+* **Google Gemini API Key**: Acquired via Google AI Studio
+
+### 9.2 Clone the Repository
+
+```bash
+git clone https://github.com/aliaarish17/Predictive_Maintenance.git
+cd Predictive-Maintenance
+```
+
+### 9.3 Backend Setup
+
+1. Open a terminal and navigate to the `backend` directory:
+   ```bash
+   cd backend
+   ```
+
+2. Create and activate a Python virtual environment:
+   * **Windows (PowerShell)**:
+     ```powershell
+     python -m venv myenv
+     .\myenv\Scripts\Activate.ps1
+     ```
+   * **macOS / Linux**:
+     ```bash
+     python3 -m venv myenv
+     source myenv/bin/activate
+     ```
+
+3. Install required Python packages:
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+4. Configure environment variables in `backend/.env`:
+   Create a `.env` file in the `backend/` directory with the following variables:
+   ```env
+   GEMINI_API_KEY=your_actual_gemini_api_key_here
+   FAILURE_MODEL_PATH=models/failure_model.pkl
+   RUL_MODEL_PATH=models/rul_model.pkl
+   RUL_SCALER_PATH=models/rul_scaler.pkl
+   ```
+
+### 9.4 (Optional) Retrain ML Models
+
+Pretrained model weights (`failure_model.pkl`, `rul_model.pkl`, `rul_scaler.pkl`) are already provided in `backend/models/`. If you want to retrain the models from the raw source datasets in `backend/data/`:
+
+1. Train the binary failure classifier (AI4I 2020 dataset):
+   ```bash
+   python ml/train_failure.py
+   ```
+   *This outputs accuracy and classification metrics, then saves `backend/models/failure_model.pkl`.*
+
+2. Train the turbofan remaining useful life regressor (CMAPSS dataset):
+   ```bash
+   python ml/train_rul.py
+   ```
+   *This runs feature engineering, scales sensors with `MinMaxScaler`, and saves `backend/models/rul_model.pkl` and `backend/models/rul_scaler.pkl`.*
+
+### 9.5 Frontend Setup
+
+1. Open a separate terminal and navigate to the `frontend` directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install all node dependencies:
+   ```bash
+   npm install
+   ```
+
+### 9.6 Running the Application
+
+#### Step 1: Start the FastAPI Backend Server
+In the activated Python backend terminal:
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+* **Interactive OpenAPI Swagger Docs**: Accessible at `http://localhost:8000/docs`
+* **ReDoc Documentation**: Accessible at `http://localhost:8000/redoc`
+* **Health Check**: `http://localhost:8000/health`
+
+#### Step 2: Start the Vite React Frontend
+In the frontend terminal:
+```bash
+npm run dev
+```
+The terminal will display the local Vite server URL (typically `http://localhost:5173` or `http://localhost:5174`). Open this URL in any modern web browser to access the application.
