@@ -143,3 +143,56 @@ Inference responses translate raw model probabilities and cycle estimations into
 | **RUL Estimation** | Predicted RUL < 45 cycles | `high` | Critical end-of-life window. Schedule immediate overhaul. |
 | **RUL Estimation** | 45 <= Predicted RUL < 100 cycles | `medium` | Degradation active. Prepare spare parts and schedule maintenance. |
 | **RUL Estimation** | Predicted RUL >= 100 cycles | `low` | Healthy operating horizon. Continue routine monitoring. |
+
+
+---
+
+## 5. Explainable AI & Generative Diagnostic Intelligence
+
+A critical barrier to deploying machine learning in heavy industry is the "black box" nature of complex models. This platform addresses interpretability at two complementary levels: quantitative feature attribution through SHAP and qualitative diagnostic communication through Google Gemini 2.5 Flash.
+
+### 5.1 SHAP (SHapley Additive exPlanations)
+
+* **Pre-initialized TreeExplainer**: During server initialization, SHAP `TreeExplainer` instances are fitted once over the deserialized XGBoost trees. This avoids recomputing tree topologies on every request and keeps inference times within milliseconds.
+* **Marginal Attribution Calculation**: For each input vector $x$, SHAP computes the Shapley value $\phi_j$ for each feature $j$:
+  $$\phi_j(x) = \sum_{S \subseteq F \setminus \{j\}} \frac{|S|!(|F| - |S| - 1)!}{|F|!} \left[ f(S \cup \{j\}) - f(S) \right]$$
+  where $F$ is the complete feature set, and $S$ is any subset excluding feature $j$.
+* **Feature Extraction**:
+  * For failure prediction, SHAP calculates the attributions on raw inputs across all 5 features.
+  * For RUL prediction, SHAP evaluates contributions across the 14 scaled sensor signals.
+  * The top 6 features sorted by absolute magnitude $|\phi_j|$ are returned in the API response:
+    ```json
+    [
+      {"feature": "tool_wear", "value": 0.4215},
+      {"feature": "torque", "value": 0.2831},
+      {"feature": "rotational_speed", "value": -0.1542}
+    ]
+    ```
+* **Frontend Visualization**:
+  * Red bar ($\phi_j > 0$): Increases the likelihood of breakdown / accelerates machine degradation.
+  * Cyan bar ($\phi_j < 0$): Stabilizes the machine / drives risk downward toward baseline.
+
+### 5.2 Google Gemini 2.5 Flash LLM Integration
+
+The backend leverages Google's `gemini-2.5-flash` model via the official `google-genai` SDK to convert quantitative telemetry and SHAP vectors into conversational, domain-specific advice.
+
+* **Conditional API Invocation**:
+  * **Low Risk**: To reduce latency and minimize token consumption, predictions falling into the `low` risk tier bypass the Gemini API entirely. The backend returns a pre-configured, validated normal-status response.
+  * **Medium & High Risk**: The backend constructs a structured prompt combining the prediction outcome, signed SHAP impact factors, and raw sensor values, dispatching it to `gemini-2.5-flash`.
+* **Prompt Engineering & Contract Enforcement**:
+  The system prompt enforces strict syntactic formatting so the React client can parse the response deterministically:
+  ```
+  EXPLANATION
+  <3 sentences max explaining why this prediction was made in plain language. No ML jargon.>
+
+  ACTIONS
+  - <action 1>
+  - <action 2>
+  - <action 3>
+  ```
+* **Automated Client Parsing**:
+  * The frontend splits the returned payload across the `ACTIONS` delimiter.
+  * The diagnostic block is displayed under the "Why This Happened" card.
+  * The action items are rendered as prioritized checklist entries with maintenance status indicators.
+* **Graceful Degradation (Fallback Handler)**:
+  If an API rate limit, quota exhaustion, or network disconnect occurs, the backend catches the exception and immediately supplies a structured fallback diagnostic, ensuring the user interface never stalls or drops the prediction payload.
