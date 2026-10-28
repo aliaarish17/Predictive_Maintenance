@@ -320,3 +320,57 @@ curl -X POST http://localhost:8000/predict/rul \
 ```bash
 curl -X GET "http://localhost:8000/history?risk_level=high&limit=10"
 ```
+
+
+---
+
+## 7. Database Architecture & Persistence Layer
+
+All incoming telemetry, model outputs, SHAP explanations, and AI recommendations are committed to an embedded SQLite database (`backend/predictive_maintenance.db`).
+
+### 7.1 Relational Schema (`predictions` table)
+
+The database schema is initialized automatically upon application startup through FastAPI's lifespan handler:
+
+```sql
+CREATE TABLE IF NOT EXISTS predictions (
+    id TEXT PRIMARY KEY,
+    created_at TEXT NOT NULL,
+    source TEXT NOT NULL,
+    machine_unit TEXT,
+    machine_type TEXT,
+    input_data TEXT NOT NULL,
+    prediction_type TEXT NOT NULL,
+    result TEXT NOT NULL,
+    shap_values TEXT NOT NULL,
+    ai_explanation TEXT,
+    risk_level TEXT NOT NULL
+);
+```
+
+### 7.2 Field Specifications
+
+| Column | SQL Type | Description |
+|---|---|---|
+| `id` | `TEXT PRIMARY KEY` | Universally Unique Identifier (UUIDv4) generated per inference request. |
+| `created_at` | `TEXT` | Timestamp string recorded in Indian Standard Time (IST, UTC+5:30) via `%Y-%m-%d %H:%M:%S`. |
+| `source` | `TEXT` | Request origin identifier: `'predict_input'` (manual form) or `'select_machine'` (preconfigured unit). |
+| `machine_unit` | `TEXT` | Plant identifier or turbofan unit label (e.g., `'Unit_1'`, `'Milling-Unit-04'`). Nullable. |
+| `machine_type` | `TEXT` | Tool quality rating: `'L'` (Low), `'M'` (Medium), `'H'` (High). Nullable. |
+| `input_data` | `TEXT` | Serialized JSON payload containing the raw multi-sensor telemetry readings submitted. |
+| `prediction_type` | `TEXT` | Categorical classification of request: `'failure'` or `'rul'`. |
+| `result` | `TEXT` | Serialized JSON dictionary of inference results (`failure_predicted`, `confidence`, or `rul_cycles`). |
+| `shap_values` | `TEXT` | Serialized JSON array of the top 6 features and their signed marginal impact values. |
+| `ai_explanation` | `TEXT` | Raw text block returned by Gemini 2.5 Flash (`EXPLANATION` and `ACTIONS`). |
+| `risk_level` | `TEXT` | Normalized operational risk classification: `'low'`, `'medium'`, or `'high'`. |
+
+### 7.3 Data Access Pattern & Thread Safety
+
+* **Context-Managed Sessions**: Database connections are wrapped inside a Python context manager (`get_db()`) that ensures every connection is securely committed and closed immediately upon transaction completion, preventing connection leaks.
+* **Row Factory Mapping**: The `sqlite3.Row` factory is utilized to enable dict-like key access across SQL results.
+* **Parameterized Filtering**: The `get_history()` query engine builds parameterized `WHERE` clauses dynamically, preventing SQL injection vulnerabilities while enabling flexible multi-dimensional filtering across risk tiers and prediction types:
+  ```python
+  def get_history(risk_level: str | None = None, prediction_type: str | None = None, limit: int = 50):
+      # Dynamic parameterized query construction
+      ...
+  ```
