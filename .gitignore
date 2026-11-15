@@ -10,7 +10,7 @@ backend/*.pyc
 **/.env.*
 backend/predictive_maintenance.db
 backend/.pytest_cache/
-node_modules
+node_modules/
 
 # ============================
 # FRONTEND (React/Vite)
