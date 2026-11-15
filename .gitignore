@@ -1,25 +1,41 @@
 # ============================
+# DEPENDENCIES (Universal)
+# ============================
+node_modules/
+**/node_modules/
+frontend/node_modules/
+package-lock.json
+
+# ============================
 # BACKEND (Python/FastAPI)
 # ============================
 backend/myenv/
 backend/venv/
-backend/__pycache__/
 backend/**/__pycache__/
-backend/*.pyc
-**/.env
-**/.env.*
-backend/predictive_maintenance.db
+**/__pycache__/
+*.py[cod]
+*$py.class
 backend/.pytest_cache/
-node_modules/
+.pytest_cache/
+backend/predictive_maintenance.db
+*.db
+*.sqlite3
 
 # ============================
 # FRONTEND (React/Vite)
 # ============================
-frontend/node_modules/
 frontend/dist/
-frontend/.env
-frontend/.env.*
 frontend/.vite/
+dist/
+build/
+
+# ============================
+# ENVIRONMENT VARIABLES & SECRETS
+# ============================
+**/.env
+**/.env.*
+.env
+.env.*
 
 # ============================
 # EDITOR / OS FILES
