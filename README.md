@@ -647,6 +647,14 @@ When a technician performs an evaluation on the frontend, the platform executes 
 * **Symptom**: `sqlite3.OperationalError: database is locked`.
 * **Resolution**: Ensure database connections are acquired exclusively through the `get_db()` context manager, which handles deterministic closing of connections upon completion.
 
+#### Automated Pipeline Health Verification
+To verify that all machine learning models, scalers, and SHAP explainers load and produce accurate predictions without starting the web server, run:
+```bash
+cd backend
+python verify_pipeline.py
+```
+This tests both binary failure classification and remaining useful life (RUL) estimation against test telemetry.
+
 ---
 
 ## 13. Project Metadata & Contributions
